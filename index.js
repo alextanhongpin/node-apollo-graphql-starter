@@ -1,8 +1,13 @@
-const { ApolloServer, gql } = require('apollo-server')
+const express = require('express')
+const bodyParser = require('body-parser')
+const { graphqlExpress, graphiqlExpress } = require('apollo-server-express')
 
+const { makeExecutableSchema } = require('graphql-tools')
+
+// Fake data.
 const books = [
   {
-    title: 'Harry Potter and the Chamber of Secrets',
+    title: "Harry Potter and the Sorcerer's stone",
     author: 'J.K. Rowling'
   },
   {
@@ -11,45 +16,37 @@ const books = [
   }
 ]
 
-const typeDefs = gql`
-  type Book {
-    title: String
-    author: String
-  }
-  
-  type Query {
-    books: [Book]
-  }
+// The GraphQL schema in string form.
+const typeDefs = `
+  type Query { books: [Book] }
+  type Book { title: String, author: String }
 `
 
+// The resolvers.
 const resolvers = {
-  Query: {
-    books: () => books
-  }
+  Query: { books: () => books }
 }
 
-function getUser (token) {
-  return {
-    id: 1,
-    roles: ['user', 'admin']
-  }
-}
-const server = new ApolloServer({
+// Put together a schema.
+const schema = makeExecutableSchema({
   typeDefs,
-  resolvers,
-  context: ({ req }) => {
-    // Get the user token from the headers.
-    const token = req.headers.authorization || ''
-
-    // Try to retrieve a user with the token.
-    const user = getUser(token)
-    if (!user) throw new Error('you must be logged in')
-
-    // Add the user to the context.
-    return { user }
-  }
+  resolvers
 })
 
-server.listen().then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`)
+// Initialize the app.
+const app = express()
+
+// The GraphQL endpoint.
+app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }))
+
+// GraphiQL, a visual editor for queries.
+app.use(
+  '/graphiql',
+  graphiqlExpress({
+    endpointURL: '/graphql'
+  })
+)
+
+app.listen(3000, () => {
+  console.log('Go to http://localhost:3000/graphiql to run queries!')
 })
