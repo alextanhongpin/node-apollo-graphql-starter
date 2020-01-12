@@ -7,10 +7,16 @@
     "license": "MIT",
     "dependencies": {
         "apollo-server": "^2.9.15",
-        "graphql": "^14.5.8"
+        "argon2": "^0.25.1",
+        "graphql": "^14.5.8",
+        "jsonwebtoken": "^8.5.1"
     },
     "scripts": {
-        "start": "node index.mjs"
+        "start": "node index.mjs",
+        "dev": "node_modules/.bin/nodemon index.mjs"
     },
-    "type": "module"
+    "type": "module",
+    "devDependencies": {
+        "nodemon": "^2.0.2"
+    }
 }

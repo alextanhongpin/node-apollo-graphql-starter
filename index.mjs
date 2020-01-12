@@ -1,37 +1,25 @@
 import apolloServer from 'apollo-server'
-const { ApolloServer, gql } = apolloServer
 
-const typeDefs = gql`
-  # Comments in GraphQL strings.
+import typeDefs from './schema.mjs'
+import resolvers from './resolvers.mjs'
+import { decodedToken } from './auth.mjs'
 
-  type Book {
-    title: String
-    author: String
+const { ApolloServer } = apolloServer
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: ({ req }) => {
+    const auth = decodedToken(req)
+    const user = auth
+    return {
+      user
+      // models: {
+      // User: generateUserModel(auth)
+      // }
+    }
   }
-
-  type Query {
-    books: [Book]
-  }
-`
-
-const books = [
-  {
-    title: 'Harry Potter and the Chamber of Secrets',
-    author: 'J.K. Rowling'
-  },
-  {
-    title: 'Jurassic Park',
-    author: 'Michael Crichton'
-  }
-]
-
-const resolvers = {
-  Query: {
-    books: () => books
-  }
-}
-
-const server = new ApolloServer({ typeDefs, resolvers })
+})
 
 server.listen().then(({ url }) => {
   console.log(`🚀  Server ready at ${url}`)
