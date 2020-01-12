@@ -13,7 +13,6 @@ const typeDefs = gql`
     id: ID!
     email: String!
     name: String!
-    password: String!
   }
 
   type Mutation {

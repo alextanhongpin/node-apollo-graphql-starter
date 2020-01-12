@@ -1,13 +1,33 @@
 import jwt from 'jsonwebtoken'
 
-export const decodedToken = (req, requireAuth = true) => {
-  console.log(req.headers)
-  const header = req.headers.authorization
-  if (!header) {
-    return {}
-    // throw new Error('authorization header is required')
+class JwtFactory {
+  #secret = ''
+
+  constructor (secret) {
+    if (!secret) throw new Error('JWT_SECRET is required')
+    this.#secret = secret
   }
-  const token = header.replace(/bearer\s/i, '')
-  const decoded = jwt.verify(token, 'supersecret')
-  return decoded
+
+  decodeHeader (req) {
+    const header = req && req.headers && req.headers.authorization
+    if (!header) return {}
+    const token = header.replace(/bearer\s/i, '')
+    const decoded = jwt.verify(token, this.#secret)
+    return decoded
+  }
+
+  sign (payload) {
+    const encoded = jwt.sign(payload, this.#secret)
+    return encoded
+  }
+
+  static default () {
+    return new JwtFactory(`supersecret`)
+  }
+
+  static fromEnv () {
+    return new JwtFactory(process.env.JWT_SECRET)
+  }
 }
+
+export default JwtFactory
