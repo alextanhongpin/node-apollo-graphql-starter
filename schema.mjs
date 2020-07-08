@@ -1,5 +1,5 @@
-import apolloServer from 'apollo-server'
-const { gql } = apolloServer
+import apolloServer from "apollo-server";
+const { gql } = apolloServer;
 
 const typeDefs = gql`
   # Comments in GraphQL strings.
@@ -39,6 +39,6 @@ const typeDefs = gql`
     books: [Book]
     users(id: ID): [User]
   }
-`
+`;
 
-export default typeDefs
+export default typeDefs;
